@@ -1,0 +1,36 @@
+﻿# 编译产物
+*.exe
+*.out
+*.app
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# 调试文件
+*.pdb
+*.ilk
+
+# IDE/编辑器
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 构建目录
+build/
+cmake-build-*/
+Debug/
+Release/
+x64/
+x86/
