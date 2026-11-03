@@ -1,12 +1,12 @@
-/*
- * sqlite_wrapper.h ¡ª¡ª SQLite3 C++ ·â×°
+ï»¿/*
+ * sqlite_wrapper.h â€”â€” SQLite3 C++ å°è£…
  *
- * ÖªÊ¶µã£º
- *   1. SQLite3 C API ·â×°Îª RAII ·ç¸ñµÄ C++ Àà
- *   2. std::unique_ptr ¹ÜÀí×ÊÔ´ÉúÃüÖÜÆÚ
- *   3. Prepared Statement£¨Ô¤±àÒëÓï¾ä£©·À SQL ×¢Èë
- *   4. ÊÂÎñ (Transaction) RAII ·â×°
- *   5. std::vector ´æ´¢²éÑ¯½á¹û
+ * çŸ¥è¯†ç‚¹ï¼š
+ *   1. SQLite3 C API å°è£…ä¸º RAII é£æ ¼çš„ C++ ç±»
+ *   2. std::unique_ptr ç®¡ç†èµ„æºç”Ÿå‘½å‘¨æœŸ
+ *   3. Prepared Statementï¼ˆé¢„ç¼–è¯‘è¯­å¥ï¼‰é˜² SQL æ³¨å…¥
+ *   4. äº‹åŠ¡ (Transaction) RAII å°è£…
+ *   5. std::vector å­˜å‚¨æŸ¥è¯¢ç»“æœ
  */
 #pragma once
 
@@ -16,23 +16,23 @@
 #include <functional>
 
 #include <sqlite3.h>
-// SQLite3 ÀàĞÍ
+// SQLite3 ç±»å‹
 
 
 
 namespace la {
 
-/// @brief Êı¾İ¿âµ¥ĞĞ¼ÇÂ¼£ºÁĞÃû -> Öµ
+/// @brief æ•°æ®åº“å•è¡Œè®°å½•ï¼šåˆ—å -> å€¼
 using Row = std::vector<std::pair<std::string, std::string>>;
 
-/// @brief SQLite3 Êı¾İ¿â·â×°£¨RAII£©
-/// ¹¹ÔìÊ±´ò¿ªÊı¾İ¿â£¬Îö¹¹Ê±×Ô¶¯¹Ø±Õ
+/// @brief SQLite3 æ•°æ®åº“å°è£…ï¼ˆRAIIï¼‰
+/// æ„é€ æ—¶æ‰“å¼€æ•°æ®åº“ï¼Œææ„æ—¶è‡ªåŠ¨å…³é—­
 class SqliteDB {
 public:
     explicit SqliteDB(const std::string& dbPath);
     ~SqliteDB();
 
-    // ½ûÖ¹¿½±´£¬ÔÊĞíÒÆ¶¯
+    // ç¦æ­¢æ‹·è´ï¼Œå…è®¸ç§»åŠ¨
     SqliteDB(const SqliteDB&) = delete;
     SqliteDB& operator=(const SqliteDB&) = delete;
     SqliteDB(SqliteDB&& other) noexcept;
@@ -40,11 +40,11 @@ public:
 
     bool isOpen() const;
 
-    // ---- Ö´ĞĞ SQL ----
-    /// Ö´ĞĞÎŞ·µ»ØµÄ SQL£¨CREATE/INSERT/UPDATE/DELETE£©
+    // ---- æ‰§è¡Œ SQL ----
+    /// æ‰§è¡Œæ— è¿”å›çš„ SQLï¼ˆCREATE/INSERT/UPDATE/DELETEï¼‰
     bool execute(const std::string& sql);
 
-    /// Ö´ĞĞ²ÎÊı»¯ SQL£¨ÎŞ·µ»ØÖµ£©
+    /// æ‰§è¡Œå‚æ•°åŒ– SQLï¼ˆæ— è¿”å›å€¼ï¼‰
     template<typename... Args>
     bool execute(const std::string& sql, Args&&... args) {
         sqlite3_stmt* stmt = prepare(sql);
@@ -55,8 +55,8 @@ public:
         return rc == SQLITE_DONE || rc == SQLITE_ROW;
     }
 
-    /// Ö´ĞĞ²éÑ¯²¢·µ»ØËùÓĞĞĞ
-    /// ²ÎÊı»¯²éÑ¯Ê¾Àı£ºquery("SELECT * FROM t WHERE id=?", 42)
+    /// æ‰§è¡ŒæŸ¥è¯¢å¹¶è¿”å›æ‰€æœ‰è¡Œ
+    /// å‚æ•°åŒ–æŸ¥è¯¢ç¤ºä¾‹ï¼šquery("SELECT * FROM t WHERE id=?", 42)
     template<typename... Args>
     std::vector<Row> query(const std::string& sql, Args&&... args) {
         sqlite3_stmt* stmt = prepare(sql);
@@ -65,29 +65,29 @@ public:
         return fetchAll(stmt);
     }
 
-    // ---- ÊÂÎñ ----
+    // ---- äº‹åŠ¡ ----
     void beginTransaction();
     void commit();
     void rollback();
 
-    // ---- ¹¤¾ß ----
+    // ---- å·¥å…· ----
     int64_t lastInsertRowId();
 
 private:
     sqlite3_stmt* prepare(const std::string& sql);
     std::vector<Row> fetchAll(sqlite3_stmt* stmt);
 
-    // µİ¹éÖÕÖ¹
+    // é€’å½’ç»ˆæ­¢
     void bindParams(sqlite3_stmt*, int) {}
-    // µİ¹é°ó¶¨²ÎÊı
+    // é€’å½’ç»‘å®šå‚æ•°
     template<typename T, typename... Rest>
     void bindParams(sqlite3_stmt* stmt, int index, T&& first, Rest&&... rest);
 
     sqlite3* m_db = nullptr;
 };
 
-/// @brief RAII ÊÂÎñ·â×°
-/// ¹¹ÔìÊ± BEGIN£¬Îö¹¹Ê± COMMIT£¨ÈôÎŞÒì³££©»ò ROLLBACK£¨ÈôÓĞÒì³££©
+/// @brief RAII äº‹åŠ¡å°è£…
+/// æ„é€ æ—¶ BEGINï¼Œææ„æ—¶ COMMITï¼ˆè‹¥æ— å¼‚å¸¸ï¼‰æˆ– ROLLBACKï¼ˆè‹¥æœ‰å¼‚å¸¸ï¼‰
 class Transaction {
 public:
     explicit Transaction(SqliteDB& db);
@@ -96,19 +96,19 @@ public:
     Transaction(const Transaction&) = delete;
     Transaction& operator=(const Transaction&) = delete;
 
-    void commit();  // ÊÖ¶¯Ìá½»
+    void commit();  // æ‰‹åŠ¨æäº¤
 
 private:
     SqliteDB& m_db;
     bool m_committed = false;
 };
 
-// ---- Ä£°åÊµÏÖ£¨±ØĞëÔÚÍ·ÎÄ¼şÖĞ£© ----
+// ---- æ¨¡æ¿å®ç°ï¼ˆå¿…é¡»åœ¨å¤´æ–‡ä»¶ä¸­ï¼‰ ----
 #include <stdexcept>
 
 template<typename T, typename... Rest>
 void SqliteDB::bindParams(sqlite3_stmt* stmt, int index, T&& first, Rest&&... rest) {
-    // sqlite3_bind_* ÏµÁĞº¯Êı£º½« C++ Öµ°ó¶¨µ½ SQL ²ÎÊı
+    // sqlite3_bind_* ç³»åˆ—å‡½æ•°ï¼šå°† C++ å€¼ç»‘å®šåˆ° SQL å‚æ•°
     if constexpr (std::is_same_v<std::decay_t<T>, int>) {
         sqlite3_bind_int(stmt, index, first);
     } else if constexpr (std::is_same_v<std::decay_t<T>, int64_t>
@@ -124,7 +124,7 @@ void SqliteDB::bindParams(sqlite3_stmt* stmt, int index, T&& first, Rest&&... re
     } else {
         throw std::runtime_error("Unsupported bind type");
     }
-    // µİ¹éÕ¹¿ª²ÎÊı°ü
+    // é€’å½’å±•å¼€å‚æ•°åŒ…
     bindParams(stmt, index + 1, std::forward<Rest>(rest)...);
 }
 

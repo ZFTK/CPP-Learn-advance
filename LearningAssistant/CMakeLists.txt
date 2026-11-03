@@ -1,15 +1,15 @@
-cmake_minimum_required(VERSION 3.16)
+ï»¿cmake_minimum_required(VERSION 3.16)
 project(LearningAssistant VERSION 1.0.0 LANGUAGES CXX)
 
 # ============================================================
-# C++ ±ê×¼ÉèÖÃ
+# C++ æ ‡å‡†è®¾ç½®
 # ============================================================
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ============================================================
-# ±àÒëÑ¡Ïî
+# ç¼–è¯‘é€‰é¡¹
 # ============================================================
 if(MSVC)
     add_compile_options(/W4 /utf-8)
@@ -18,7 +18,7 @@ else()
 endif()
 
 # ============================================================
-# ¹¦ÄÜ¿ª¹Ø ¡ª¡ª ¿ØÖÆ¸÷Ä£¿éÊÇ·ñ±àÒë
+# åŠŸèƒ½å¼€å…³ â€”â€” æ§åˆ¶å„æ¨¡å—æ˜¯å¦ç¼–è¯‘
 # ============================================================
 option(ENABLE_QT       "Build Qt GUI frontend"          OFF)
 option(ENABLE_OPENCV   "Build OpenCV OCR module"        OFF)
@@ -29,12 +29,12 @@ option(ENABLE_PLUGINS  "Build dynamic plugin system"    ON)
 option(ENABLE_THREADS  "Build multithreading module"    ON)
 
 # ============================================================
-# µÚÈı·½Í·ÎÄ¼ş¿â
+# ç¬¬ä¸‰æ–¹å¤´æ–‡ä»¶åº“
 # ============================================================
 add_subdirectory(third_party)
 
 # ============================================================
-# Ìõ¼ş²éÕÒÍâ²¿ÒÀÀµ
+# æ¡ä»¶æŸ¥æ‰¾å¤–éƒ¨ä¾èµ–
 # ============================================================
 if(ENABLE_QT)
     find_package(Qt6 COMPONENTS Widgets Core Gui QUIET)
@@ -70,13 +70,13 @@ endif()
 if(ENABLE_CURL)
     find_package(CURL QUIET)
     if(NOT CURL_FOUND)
-        # Windows »ØÍË: Ê¹ÓÃ WinHTTP
+        # Windows å›é€€: ä½¿ç”¨ WinHTTP
         message(STATUS "libcurl not found, using WinHTTP fallback")
     endif()
 endif()
 
 # ============================================================
-# ºËĞÄ¿â£¨Ê¼ÖÕ±àÒë£©
+# æ ¸å¿ƒåº“ï¼ˆå§‹ç»ˆç¼–è¯‘ï¼‰
 # ============================================================
 add_library(la_core STATIC
     src/core/app_config.cpp
@@ -87,7 +87,7 @@ target_include_directories(la_core PUBLIC src)
 target_link_libraries(la_core PUBLIC la_third_party)
 
 # ============================================================
-# Ìõ¼ş±àÒëÄ£¿é
+# æ¡ä»¶ç¼–è¯‘æ¨¡å—
 # ============================================================
 if(ENABLE_SQLITE)
     add_library(la_database STATIC
@@ -148,13 +148,13 @@ if(ENABLE_PLUGINS)
 endif()
 
 # ============================================================
-# Ö÷³ÌĞò
+# ä¸»ç¨‹åº
 # ============================================================
 add_executable(LearningAssistant
     src/main.cpp
 )
 
-# Á´½ÓËùÓĞÆôÓÃµÄÄ£¿é
+# é“¾æ¥æ‰€æœ‰å¯ç”¨çš„æ¨¡å—
 target_link_libraries(LearningAssistant PRIVATE la_core)
 if(ENABLE_SQLITE)
     target_link_libraries(LearningAssistant PRIVATE la_database)
@@ -176,7 +176,7 @@ if(ENABLE_PLUGINS)
 endif()
 
 # ============================================================
-# Qt GUI ¿ÉÖ´ĞĞÎÄ¼ş£¨¶ÀÁ¢±àÒë£©
+# Qt GUI å¯æ‰§è¡Œæ–‡ä»¶ï¼ˆç‹¬ç«‹ç¼–è¯‘ï¼‰
 # ============================================================
 if(ENABLE_QT)
     add_executable(LearningAssistantGUI
@@ -199,14 +199,14 @@ if(ENABLE_QT)
 endif()
 
 # ============================================================
-# Ê¾Àı²å¼ş
+# ç¤ºä¾‹æ’ä»¶
 # ============================================================
 if(ENABLE_PLUGINS)
     add_subdirectory(plugins)
 endif()
 
 # ============================================================
-# °²×°¹æÔò
+# å®‰è£…è§„åˆ™
 # ============================================================
 install(TARGETS LearningAssistant RUNTIME DESTINATION bin)
 install(DIRECTORY plugins/ DESTINATION lib/plugins
